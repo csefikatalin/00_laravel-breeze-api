@@ -1,66 +1,84 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+ #  Authentikációs végpontok létrehozása Laravel Breeze API-val
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+1. Laravel projekt létrehozása
 
-## About Laravel
+    composer create-project laravel/laravel laravel-breeze-api
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+    php artisan key:generate --ansi
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Ha most inicializálod a reposytorit könnyebb nyomon követni, mit változtat meg a projektben a breeze csomag.  git init
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+2. Telepítsük a breeze csomagot, majd készítsük el az API végpontokat
 
-## Learning Laravel
+    composer require laravel/breeze --dev
+    php artisan breeze:install api
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## .env fájl configurálása
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- adatbázis név és hozzáférések
+- A backend és a frontend URL-jét. 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+A Laravel applikációnk most backendként csupán  API kiszolgálóként fog működni, ezért backend és a frontend alkalmazásunk nem azonos domainen fog futni. Hiszen a backend a 8000-es, a frontend pedig a 3000-es proton lesz elérhető. Szerencsére a domain név azonos a két alkalmazás esetén. Ezket az elérési utakat be kell állítani a .env fájlban. 
 
-## Laravel Sponsors
+    APP_URL=http://localhost:8000
+    FRONTEND_URL=http://localhost:3000
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Biztonsági okokból érdemes hozzáadni az alábbi válotozókat is az .env fájlhoz: 
 
-### Premium Partners
+    SANCTUM_STATEFUL_DOMAINS=localhost:3000
+    SESSION_DOMAIN=localhost
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+A **SESSION_DOMAIN** beállítja a munkamenet cookie tartományát, ami segít megelőzni a  CSRF-támadásokat, vagy a munkamenetek eltérítését. Biztosítja, hogy csak a megadott domainről legenek elérhetőek az API kiszolgáló végpontjai. 
+Ha nem adunk meg tartományt, a Laravel az alkalmazás aktuális tartományát használja.
 
-## Contributing
+A **SANCTUM_STATEFUL_DOMAINS**  azon tartományok listáját határozza meg, melyekről engedélyezzük  az állapotmegőrző kérések küldését a Laravel Sanctum által védett  végpontokhoz. Ez is segít megelőzni CSRF-támadásokat.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Sütik (cookie) használata
 
-## Code of Conduct
+    SESSION_DRIVER=cookie
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+A **SESSION_DRIVER=cookie** azt jelenti, hogy a Laravel sütiket használ a munkamenet adatok tárolásához. Amikor egy felhasználó bejelentkezik az alkalmazásába, a program egy sütiben tárolja a munkamenet adatait a böngészőben. Ez a süti minden további kérés során automatikusan visszaküldésre kerül a kiszolgálóhoz, lehetővé téve a Laravel számára a felhasználó munkamenetadatainak lekérését és az állapotuk megőrzését a kérések között.
 
-## Security Vulnerabilities
+## Laravel auth végpontjai
+ A laravel Breeze létrehozta az alábbi végpontokat a routes/auth.php fájlban: 
+ - /register
+ - /login
+ - /forgot-password
+ - /reset-password
+ - /verify-email/{id}/{hash}
+ - /email/verification-notification
+ - /logout
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+ Frontend oldalon a bejelentkzeés és a regsiztrációs során ezekhez a végpontokat hívhatjuk meg. 
 
-## License
+ Az api.php-ban pedig a sanctum segítségével végezhetjük el a felhasználó azonosítását. 
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Változások a configurációs fájlokban
+
+### config/app.php
+
+### config/cors.php
+Módosult az engedélezett útvonalak lista, illetve az engedélyezett origins lista. 
+Valamint a supports_credentials tulajdonság beállításával engedélyezzük a cross site (nem azonos domainről érkező) kérések esetén a a kérés tartalmazza a sütiket és aegyéb hitelesítési adatokat. 
+
+Amikor kéréseket küldünk különböző tartományok vagy aldoménok között, a böngésző biztonsági okokból blokkolhatja a kéréseket. Ez a Same-Origin Policy (Azonos Eredetű Politika), amely korlátozza, hogy egy tartományból származó weboldal hogyan léphet kapcsolatba más tartományokból származó erőforrásokkal.
+
+A keresztszerver kérések engedélyezéséhez használhatjuk a Cross-Origin Resource Sharing (CORS) fejléceket, amelyek lehetővé teszik, hogy egy weboldal hozzáférjen erőforrásokhoz egy másik tartományból. A Laravel Sanctum esetében az **EnsureFrontendRequestsAreStateful** middleware állítja be  a szükséges CORS fejléceket.
+
+    'paths' => ['*'],
+    'allowed_methods' => ['*'],
+    'allowed_origins' => [env('FRONTEND_URL', 'http:/localhost:3000')],
+    'allowed_origins_patterns' => [],
+    'allowed_headers' => ['*'],
+    'exposed_headers' => [],
+    'max_age' => 0,
+    'supports_credentials' => true,
+
+A 'supports_credentials' => true beállítási lehetőség azt jelzi, hogy a keresztszerver kérések tartalmazzák a sütiket és egyéb hitelesítési adatokat. Ha ez a beállítás false-ra van állítva, akkor a CORS fejlécek nem tartalmaznak hitelesítési adatokat, és a böngésző nem fog sütiket vagy egyéb hitelesítési információkat küldeni a kéréssel.
+
+### config/sanctum.php 
+
+Itt használja fel a SANCTUM_STATEFUL_DOMAINS értéket. 
+
+
+
