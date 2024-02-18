@@ -1,6 +1,6 @@
  #  Authentikációs végpontok létrehozása Laravel Breeze API-val
 
-1. Laravel projekt létrehozása
+## Laravel projekt létrehozása
 
     composer create-project laravel/laravel laravel-breeze-api
 
@@ -8,7 +8,7 @@
 
 Ha most inicializálod a reposytorit könnyebb nyomon követni, mit változtat meg a projektben a breeze csomag.  git init
 
-2. Telepítsük a breeze csomagot, majd készítsük el az API végpontokat
+## Telepítsük a breeze csomagot, majd készítsük el az API végpontokat
 
     composer require laravel/breeze --dev
     php artisan breeze:install api
@@ -53,11 +53,11 @@ A **SESSION_DRIVER=cookie** azt jelenti, hogy a Laravel sütiket használ a munk
 
  Az api.php-ban pedig a sanctum segítségével végezhetjük el a felhasználó azonosítását. 
 
-## Változások a configurációs fájlokban
+### Változások a configurációs fájlokban
 
-### config/app.php
+#### config/app.php
 
-### config/cors.php
+#### config/cors.php
 Módosult az engedélezett útvonalak lista, illetve az engedélyezett origins lista. 
 Valamint a supports_credentials tulajdonság beállításával engedélyezzük a cross site (nem azonos domainről érkező) kérések esetén a a kérés tartalmazza a sütiket és aegyéb hitelesítési adatokat. 
 
@@ -76,9 +76,9 @@ A keresztszerver kérések engedélyezéséhez használhatjuk a Cross-Origin Res
 
 A 'supports_credentials' => true beállítási lehetőség azt jelzi, hogy a keresztszerver kérések tartalmazzák a sütiket és egyéb hitelesítési adatokat. Ha ez a beállítás false-ra van állítva, akkor a CORS fejlécek nem tartalmaznak hitelesítési adatokat, és a böngésző nem fog sütiket vagy egyéb hitelesítési információkat küldeni a kéréssel.
 
-### config/sanctum.php 
+#### config/sanctum.php 
 
 Itt használja fel a SANCTUM_STATEFUL_DOMAINS értéket. 
 
-
+## Migráljuk az adatbázist
 
