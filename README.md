@@ -82,3 +82,10 @@ Itt használja fel a SANCTUM_STATEFUL_DOMAINS értéket.
 
 ## Migráljuk az adatbázist
 
+
+## web.php fájlban token lekérése
+
+    Route::get('/token', function () {
+        return request()->session()->token();
+    });
+
